@@ -1,0 +1,31 @@
+﻿@page "/"
+@model DiabetesPredictorRazor.Pages.TopDiabetesRiskModel
+@{
+    ViewData["Title"] = "Top Diabetes Risk";
+}
+
+<h1 class="display-4 mb-3">Top 5 At-Risk Patients</h1>
+<p class="lead text-muted">Patients most likely to have diabetes based on risk factors</p>
+<hr />
+
+<table class="table table-striped table-bordered table-hover mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Glucose</th>
+            <th>BMI</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.TopPatients)
+        {
+            <tr>
+                <td>@p.Name</td>
+                <td>@p.Age</td>
+                <td>@p.Glucose</td>
+                <td>@p.BMI</td>
+            </tr>
+        }
+    </tbody>
+</table>
