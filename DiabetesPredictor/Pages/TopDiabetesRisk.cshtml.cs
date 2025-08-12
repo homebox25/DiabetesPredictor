@@ -3,7 +3,8 @@ using DiabetesPredictor.Pages.Data;
 using DiabetesPredictor.Pages.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using System.Data;
+//using Microsoft.EntityFrameworkCore;
 
 namespace DiabetesPredictorRazor.Pages
 {
@@ -25,13 +26,28 @@ namespace DiabetesPredictorRazor.Pages
         public void OnGet()
         {
 
-            TopPatients = _context.Patients
-            .FromSqlRaw("EXEC GetTop5AtRiskPatients")
-            .ToList();
 
-            // Ensure it's never null
-            if (TopPatients == null)
-                TopPatients = new List<Patient>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("GetTop5AtRiskPatients", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                conn.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        TopPatients.Add(new Patient
+                        {
+                            PatientId = reader.GetInt32(reader.GetOrdinal("PatientId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                            Glucose = reader.GetDouble(reader.GetOrdinal("Glucose")),
+                            BMI = reader.GetDouble(reader.GetOrdinal("BMI"))
+                        });
+                    }
+                }
+            }
         }
     }
 }
